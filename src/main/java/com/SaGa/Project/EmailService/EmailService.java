@@ -20,6 +20,7 @@ public class EmailService {
 
     public void sendConfirmationEmail(String toEmail, String confirmationToken) {
         String confirmationLink = "http://localhost:5173/verificationSuccess?token=" + confirmationToken;
+        System.out.println(confirmationLink);
         String subject = "Email Verification";
         String content = "<p>Dear user,</p>"
                 + "<p>Please click the link below to verify your registration:</p>"

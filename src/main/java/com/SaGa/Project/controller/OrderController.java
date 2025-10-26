@@ -17,8 +17,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/placeOrder")
-    public ResponseEntity<Order> addOrder(@RequestBody Order order){
-        Order newOrder = orderService.addOrder(order);
+    public ResponseEntity<Order> addOrder(@RequestBody Order order, @RequestHeader String adminId){
+        Order newOrder = orderService.addOrder(order, adminId);
         return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
     }
 
@@ -38,5 +38,13 @@ public class OrderController {
     public ResponseEntity<Order> getOrderById(@PathVariable String orderId, @RequestParam String adminUserId) {
         Order order = orderService.getOrderById(orderId, adminUserId);
         return new ResponseEntity<>(order, HttpStatus.OK);
+    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getUserOrders(@PathVariable String userId){
+        List<Order> orders = orderService.getUserOrders(userId);
+        if(orders == null){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(orders, HttpStatus.FOUND);
     }
 }

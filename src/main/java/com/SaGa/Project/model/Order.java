@@ -14,6 +14,7 @@ public class Order {
     @Id
     private String id;
     private String userId;
+    private String adminId;
     private List<CartItem> items;
     private BigDecimal totalPrice;
     private Address shippingAddress;
@@ -93,5 +94,13 @@ public class Order {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(String adminId) {
+        this.adminId = adminId;
     }
 }

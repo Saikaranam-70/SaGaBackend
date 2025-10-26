@@ -1,8 +1,13 @@
 package com.SaGa.Project.controller;
 
+import com.SaGa.Project.dto.Attributes;
+import com.SaGa.Project.model.Offer;
 import com.SaGa.Project.model.Product;
+import com.SaGa.Project.service.CloudinaryService;
+import com.SaGa.Project.service.OfferService;
 import com.SaGa.Project.service.ProductService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -19,9 +24,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/product")
@@ -30,12 +33,93 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private OfferService offerService;
+
     @PostMapping("/add")
-    @PreAuthorize("hashRole('ADMIN')")
-    public ResponseEntity<Product> addProduct(@ModelAttribute Product product, @RequestPart("image")MultipartFile image) throws IOException {
-        Product savedProduct = productService.addProduct(product, image);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> addProduct(
+            @RequestParam("name") String name,
+            @RequestParam("brand") String brand,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("category") String category,
+            @RequestParam("subCategory") String subCategory,
+            @RequestParam(value = "discount", required = false) BigDecimal discount,
+            @RequestParam(value = "stock", required = false) Integer stock,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "attributes", required = false) String attributesJson,
+            @RequestPart("image") MultipartFile image,
+            @RequestParam("adminId") String adminId
+
+    ) throws IOException {
+
+        Product product = new Product();
+        product.setName(name);
+        product.setBrand(brand);
+        product.setPrice(price);
+        product.setCategory(category);
+        product.setSubCategory(subCategory);
+        product.setDiscount(discount != null ? discount : BigDecimal.ZERO);
+        product.setStock(stock != null ? stock : 0);
+        product.setDescription(description);
+
+        // Parse attributes JSON string to List<Attributes>
+        if (attributesJson != null && !attributesJson.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            List<Attributes> attributeList = Arrays.asList(mapper.readValue(attributesJson, Attributes[].class));
+            product.setAttributes(attributeList);
+        }
+
+        // Upload image
+        String uri = cloudinaryService.uploadFile(image);
+        product.setImageUrl(uri);
+        product.setAddedBy(adminId);
+        product.setCreatedAt(new Date());
+
+        Product savedProduct = productService.addProduct(product);
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
+
+//    @DeleteMapping("/delete/{id}")
+//    @PreAuthorize("hasRole('ADMIN')")
+
+
+    @PostMapping("/add/offer")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Offer> addOffer(@RequestParam("name") String name,
+                                          @RequestParam("image") MultipartFile image,
+                                          @RequestParam("addedBy") String addedBy) throws IOException{
+        Offer offer = new Offer();
+        offer.setName(name);
+        String uri = cloudinaryService.uploadFile(image);
+        offer.setImgUrl(uri);
+        offer.setAddedBy(addedBy);
+
+        Offer savedOffer = offerService.addOffer(offer);
+        return new ResponseEntity<>(savedOffer, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/getofferbyadmin/{id}")
+    public ResponseEntity<List<Offer>> getOffers(@PathVariable String adminId){
+        List<Offer> offers = offerService.getOffersByAdmin(adminId);
+        if(offers.isEmpty()){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(offers, HttpStatus.FOUND);
+    }
+
+    @GetMapping("/offer/getAll")
+    public ResponseEntity<List<Offer>> getAllOffers(){
+        List<Offer> offers = offerService.getAllOffers();
+        if(offers.isEmpty()){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(offers, HttpStatus.FOUND);
+    }
+
 
     @GetMapping("/getProductById/{productId}")
     public ResponseEntity<Product> getProductById(@PathVariable String productId){

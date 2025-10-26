@@ -47,6 +47,20 @@ public class UserController {
         }
     }
 
+    @GetMapping("/resend-verification-token/{email}")
+    public ResponseEntity<UserResponce> resend_email_verification_token(@PathVariable("email") String email){
+        System.out.println(email);
+        Optional<User> optionalUser = userService.findUserByEmail(email);
+        if(!optionalUser.isEmpty()){
+            String confirmationId = UUID.randomUUID().toString();
+            userService.saveConfirmationId(email, confirmationId);
+            emailService.sendConfirmationEmail(email, confirmationId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponce("Please Verify Your Email", email));
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserResponce("User With email :"+ email+" is not Exist. Please Create Account", null));
+        }
+    }
+
     @PostMapping("/admin/register")
     public ResponseEntity<UserResponce> registerAsAdmin(@RequestBody User user) throws AdminAlreadyExistException {
         try{
@@ -78,9 +92,11 @@ public class UserController {
         }
     }
 
-    @GetMapping("/confirm")
+    @PostMapping("/confirm")
     public ResponseEntity<String> confirmUser(@RequestParam String token){
+
         ConfirmationResponse result = userService.findUserByConfirmation(token);
+        System.out.println(token);
 
         return new ResponseEntity<>(result.getMessage(), HttpStatus.FOUND);
     }

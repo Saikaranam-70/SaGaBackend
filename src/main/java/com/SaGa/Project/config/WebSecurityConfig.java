@@ -45,21 +45,25 @@ public class WebSecurityConfig {
             "/user/confirm",
             "/user/forgot-password",
             "/user/reset-password",
+            "/product/add",
 //            "/user/getUser/{userId}",
 //            "/cartItem/add",
 //            "/cartItem/get/**",
 //            "/cartItem/getAll",
 //            "/cartItem/delete/**",
 //            "/cartItem/update/**",
-//            "/cart/add/**",
-//            "/cart/**",
+            "/cart/add/**",
+            "/cart/**",
 //            "/cart/remove/**",
 //            "/cart/clear/**",
 //            "/address/**",
 //            "/address/getAddress/**",
-//            "/orders/placeOrder",
+            "/orders/placeOrder",
+            "/orders/user/**",
 //            "/rating/**",
             "/rating/average-Rating/**",
+            "/product/add/offer",
+            "/product/offer/getAll",
 //            "/review/**",
 //            "/product/getProductById/**",
 //            "/product/getAllProducts",
@@ -75,9 +79,9 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(corf -> corf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/product/getProductById/**", "/product/getAllProducts", "/product/getProductByCategory/**", "/product/search", "/product/categories", "/product/top-discounts", "/product/images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/user/resend-verification-token/**", "/product/getProductById/**", "/product/getAllProducts", "/product/getProductByCategory/**", "/product/search", "/product/categories", "/product/top-discounts", "/product/images/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/confirm").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/confirm").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/reset-password").permitAll()
                         .requestMatchers(WHITE_LIST_URLS).permitAll()
                         .requestMatchers("/product/add").hasRole("ADMIN")

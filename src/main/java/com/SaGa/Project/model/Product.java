@@ -1,5 +1,6 @@
 package com.SaGa.Project.model;
 
+import com.SaGa.Project.dto.Attributes;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.w3c.dom.ls.LSInput;
@@ -19,13 +20,15 @@ public class Product {
     private BigDecimal price;
     private BigDecimal discount;
     private String category;
+    private String subCategory;
     private String brand;
     private int stock;
     private String imageUrl;
-    private Map<String, String> attributes;
+    private List<Attributes> attributes = new ArrayList<>();
     private List<Rating> ratings = new ArrayList<>();
     private List<Review> reviews = new ArrayList<>();
     private Date createdAt;
+    private String addedBy;
 
     public String getId() {
         return productId;
@@ -100,6 +103,14 @@ public class Product {
         this.stock = stock;
     }
 
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -108,12 +119,20 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public Map<String, String> getAttributes() {
+    public List<Attributes> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(List<Attributes> attributes) {
         this.attributes = attributes;
+    }
+
+    public String getAddedBy() {
+        return addedBy;
+    }
+
+    public void setAddedBy(String addedBy) {
+        this.addedBy = addedBy;
     }
 
     public List<Rating> getRatings() {

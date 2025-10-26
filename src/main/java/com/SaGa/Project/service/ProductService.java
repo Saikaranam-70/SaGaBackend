@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Service
 public interface ProductService {
-    Product addProduct(Product product, MultipartFile image) throws IOException;
+    Product addProduct(Product product) throws IOException;
 
     Optional<Product> getProductById(String productId);
 

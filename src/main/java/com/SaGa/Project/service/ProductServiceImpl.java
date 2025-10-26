@@ -32,11 +32,9 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private UserRepository userRepository;
     @Override
-    public Product addProduct(Product product, MultipartFile image) throws IOException {
+    public Product addProduct(Product product) throws IOException {
 
-        String imageUrl = uploadImage(image);
-        product.setImageUrl(imageUrl);
-        product.setCreatedAt(new Date());
+        System.out.println("called");
 
         return productRepository.save(product);
     }

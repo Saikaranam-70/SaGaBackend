@@ -32,7 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private CartRepository cartRepository;
 
     @Override
-    public Order addOrder(Order order) {
+    public Order addOrder(Order order, String adminId) {
         Optional<User> optionalUser = userRepository.findById(order.getUserId());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -48,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
                 order.setItems(cart.getItems());
                 order.setTotalPrice(cart.getTotalPrice());
                 order.setCreatedAt(new Date());
+                order.setAdminId(adminId);
 
                 cart.getItems().forEach(item -> {
                     Optional<Product> optionalProduct = productRepository.findById(item.getProductId());
@@ -88,6 +89,8 @@ public class OrderServiceImpl implements OrderService {
             throw new UserNotFoundException("User not found");
         }
     }
+
+
 
     @Override
     public Order updateOrder(Order updatedOrder) {
@@ -149,5 +152,14 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new UserNotFoundException("Admin user not found.");
         }
+    }
+
+    @Override
+    public List<Order> getUserOrders(String userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        if (orders.isEmpty()){
+            throw new OrderNotFoundException("orders not found");
+        }
+        return orders;
     }
 }
